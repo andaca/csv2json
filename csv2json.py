@@ -4,6 +4,7 @@ import argparse
 import csv
 import json
 from itertools import islice
+from pathlib import Path
 
 
 def get_args():
@@ -35,9 +36,13 @@ def main():
     data = islice(data, args.take)
 
     if args.out:
+        if Path(args.out).exists():
+            prompt = '\"{}\" already exists and will be overwritten. Continue? [y/N] '
+            if input(prompt.format(args.out)).lower() != 'y':
+                raise SystemExit()
         try:
             with open(args.out, 'w') as f:
-                json.dump(data, f)
+                json.dump(list(data), f)
         except Exception as e:
             raise SystemExit('ERROR OPENING OUTPUT FILE:\n{}'.format(e))
     else:
